@@ -16,3 +16,4 @@ class Wrestler:
     trainers: list
     nicknames: list
     signature_moves: list
+    

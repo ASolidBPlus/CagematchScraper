@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from data_classes import wrestler
+from data_classes import wrestler, trainer
 
 class CagematchAccess:
     def __init__(self) -> None:
@@ -30,9 +30,9 @@ class CagematchWrestlerAccess(CagematchAccess):
             self._get_weight(wrestler_soup),
             self._get_background_in_sports(wrestler_soup),
             self._get_social_media_links(wrestler_soup),
-            [], # Roles Placeholder
+            self._get_roles(wrestler_soup),
             self._get_wrestling_style(wrestler_soup),
-            [], # Trainer Placeholder
+            self._get_trainers(wrestler_soup),
             self._get_nicknames(wrestler_soup),
             self._get_signature_moves(wrestler_soup))
 
@@ -47,8 +47,17 @@ class CagematchWrestlerAccess(CagematchAccess):
         return self._get_wrestler_data_base(wrestler_soup, text_search).split(", ")
 
     def _get_br_entries(self, wrestler_soup, text_search):
+        
         br_data = self._get_wrestler_data_base(wrestler_soup, text_search, return_text=False).findAll('br')
-        return [br_data[0].previousSibling] + [br.nextSibling for br in br_data if br.nextSibling]
+
+        try:
+            return [br_data[0].previousSibling] + [br.nextSibling for br in br_data if br.nextSibling]
+        except:
+            return [self._get_wrestler_data_base(wrestler_soup, text_search)]
+
+    def _get_id_from_url(self, link):
+        match = re.search(r"nr=(\d+)", link)
+        return match.group(1)
 
     def _get_main_name(self, wrestler_soup):
         return wrestler_soup.find("h1").text
@@ -82,6 +91,7 @@ class CagematchWrestlerAccess(CagematchAccess):
         return [link['href'] for link in social_media_data.find_all('a', href=True)]
 
     def _get_wrestling_style(self, wrestler_soup):
+        print("No it does not?")
         return self._get_split_entries(wrestler_soup, "Wrestling style:")
 
     def _get_alter_egos(self, wrestler_soup):
@@ -103,11 +113,28 @@ class CagematchWrestlerAccess(CagematchAccess):
 
         for entry in table_content:
             link = entry.find('a', href=True)['href']
-            match = re.search(r"nr=(\d+)", link)
+            link_id = self._get_id_from_url(link)
             
             try:
-                if match.group(1) == str(cagematch_wrestler_id):
+                if link_id == str(cagematch_wrestler_id):
                     return entry.find_all("td")[2].text.replace(".", "/")
 
             except:
                 print(f"Warning: An issue was found when attempting to parse the date for id {cagematch_wrestler_id}, this was done during matching regex for the id on one of the search entries.")
+    
+    def _get_roles(self, wrestler_soup):
+        print("Does it fail here")
+        return self._get_br_entries(wrestler_soup, "Roles:")
+
+    def _get_trainers(self, wrestler_soup):
+        trainers_data = self._get_wrestler_data_base(wrestler_soup, "Trainer:", False).find_all('a', href=True)
+        trainer_entries = []
+
+        for trainer_data in trainers_data:
+            trainer_entries.append(
+                trainer.Trainer(
+                trainer_data.text,
+                self._get_id_from_url(trainer_data['href'])
+            ))
+
+        return trainer_entries
