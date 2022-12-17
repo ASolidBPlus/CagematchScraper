@@ -17,13 +17,13 @@ class CagematchWrestlerAccess(CagematchAccess):
 
     def scrape_wrestler(self, cagematch_wrestler_id):
         wrestler_soup = self._scrape_data(f"https://www.cagematch.net/?id=2&nr={str(cagematch_wrestler_id)}")
-        return self._construct_wrestler_data(wrestler_soup)
+        return self._construct_wrestler_data(cagematch_wrestler_id, wrestler_soup)
 
-    def _construct_wrestler_data(self, wrestler_soup):
+    def _construct_wrestler_data(self, cagematch_wrestler_id, wrestler_soup):
         return wrestler.Wrestler(
-            self._get_current_gimmick_name(wrestler_soup),
+            self._get_main_name(wrestler_soup),
             self._get_alter_egos(wrestler_soup),
-            "", # DOB Placeholder
+            self._get_dob(cagematch_wrestler_id, wrestler_soup),
             self._get_birthplace(wrestler_soup),
             self._get_gender(wrestler_soup),
             self._get_height(wrestler_soup),
@@ -50,8 +50,8 @@ class CagematchWrestlerAccess(CagematchAccess):
         br_data = self._get_wrestler_data_base(wrestler_soup, text_search, return_text=False).findAll('br')
         return [br_data[0].previousSibling] + [br.nextSibling for br in br_data if br.nextSibling]
 
-    def _get_current_gimmick_name(self, wrestler_soup):
-        return self._get_wrestler_data_base(wrestler_soup, "Current gimmick:")
+    def _get_main_name(self, wrestler_soup):
+        return wrestler_soup.find("h1").text
 
     def _get_birthplace(self, wrestler_soup):
         return self._get_wrestler_data_base(wrestler_soup, "Birthplace:")
@@ -93,3 +93,21 @@ class CagematchWrestlerAccess(CagematchAccess):
 
     def _get_signature_moves(self, wrestler_soup):
         return self._get_br_entries(wrestler_soup, "Signature moves:")
+
+    def _get_dob(self, cagematch_wrestler_id, wrestler_soup):
+        search_term = self._get_main_name(wrestler_soup).replace(" ", "+")
+        search_url = f"https://www.cagematch.net/?id=2&view=workers&search={search_term}"
+        search_soup = self._scrape_data(search_url)
+
+        table_content = search_soup.findAll('table')[0].find_all('tr')[1:]
+
+        for entry in table_content:
+            link = entry.find('a', href=True)['href']
+            match = re.search(r"nr=(\d+)", link)
+            
+            try:
+                if match.group(1) == str(cagematch_wrestler_id):
+                    return entry.find_all("td")[2].text.replace(".", "/")
+
+            except:
+                print(f"Warning: An issue was found when attempting to parse the date for id {cagematch_wrestler_id}, this was done during matching regex for the id on one of the search entries.")

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Wrestler:
-    current_gimmick: str
+    main_name: str
     alter_egos: list
     dob: str
     birthplace: str
