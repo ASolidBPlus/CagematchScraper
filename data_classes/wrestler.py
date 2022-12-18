@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from data_classes.cagematchobject import CagematchObject
 
 @dataclass
-class Wrestler:
+class Wrestler(CagematchObject):
     main_name: str
     alter_egos: list
     dob: str
@@ -19,10 +20,4 @@ class Wrestler:
 
     def __str__(self):
         return self.main_name
-
-    def lbs(self):
-        return self.weight * 2.20462
-
-    def ft(self):
-        return height / 2.54
     
