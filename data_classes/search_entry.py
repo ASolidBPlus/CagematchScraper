@@ -5,6 +5,8 @@ from data_classes.cagematchobject import CagematchObject
 # Shared attributes that all the "main" classes use
 @dataclass
 class SearchEntry(CagematchObject):
+    entry_type: str
+    search_id: int
     result_placement: int
 
 @dataclass
@@ -57,3 +59,28 @@ class MatchguideSearchEntry(DateEntry, PromotionIdEntry, RatingsEntry, MatchType
 @dataclass
 class AdvancedMatchSearchEntry(DateEntry, PromotionIdEntry, LocationEntry, EventNameEntry):
     match: str
+
+@dataclass
+class PromotionSearchEntry(PromotionIdEntry, LocationEntry, RatingsEntry):
+    name: str
+    years: str
+
+@dataclass
+class TitleSearchEntry(PromotionIdEntry, RatingsEntry):
+    title: str
+    status: str
+
+@dataclass
+class TagTeamSearchEntry(MembersEntry, RatingsEntry):
+    most_popular_name: str
+
+@dataclass
+class StableSearchEntry(MembersEntry, RatingsEntry):
+    name: str
+    active_time: str
+
+@dataclass
+class TournamentSearchEntry(PromotionIdEntry, RatingsEntry):
+    title: str
+    timeframe: str
+    winners: list
