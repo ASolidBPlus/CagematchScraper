@@ -39,6 +39,7 @@ class EventNameEntry(SearchEntry):
     event_name: str
 
 # Main Search Classes
+# Classes that search methods will be built around
 @dataclass
 class WrestlerSearchEntry(RatingsEntry, PromotionIdEntry):
     gimmick: str
