@@ -3,6 +3,7 @@ from data_classes.cagematchobject import CagematchObject
 
 @dataclass
 class Wrestler(CagematchObject):
+    cagematch_wrestler_id: int
     main_name: str
     alter_egos: list
     dob: str
@@ -17,7 +18,3 @@ class Wrestler(CagematchObject):
     trainers: list
     nicknames: list
     signature_moves: list
-
-    def __str__(self):
-        return self.main_name
-    

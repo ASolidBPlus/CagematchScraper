@@ -1,14 +1,16 @@
 from accessors.cagematch_wrestler_accessor import CagematchWrestlerAccessor
 from accessors.cagematch_search_accessor import CagematchSearchAccessor
-
+import multiprocessing
 
 class Cagematch:
-    def __init__(self) -> None:
-        self.__wrestler_access = CagematchWrestlerAccessor()
-        self.__search_access = CagematchSearchAccessor()
-        self.__event_access = None
-        self.__match_access = None
+    
+    @classmethod
+    def get_wrestler(cls, cagematch_wrestler_id, search_result=None):
+        return CagematchWrestlerAccessor.scrape_wrestler(cagematch_wrestler_id, search_result)
 
-    def get_wrestler(self, cagematch_wrestler_id):
-        return self.__wrestler_access.scrape_wrestler(cagematch_wrestler_id)
+    @classmethod
+    def search_wrestler(cls, text=None):
+        return CagematchSearchAccessor.search_wrestler(text)
 
+if __name__ == '__main__':
+    Cagematch()
