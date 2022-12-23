@@ -6,10 +6,9 @@ from data_classes.wrestler import Wrestler
 from data_classes.trainer import Trainer
 
 class CagematchWrestlerAccessor(CagematchAccessor):
-
     @classmethod
-    def _get_wrestler_selected_element(cls, wrestler_soup, text_search, return_text=True):
-        selected_element = wrestler_soup.select(f"div.InformationBoxTitle:-soup-contains('{text_search}') + div.InformationBoxContents")
+    def _get_wrestler_selected_element(cls, soup, text_search, return_text=True):
+        selected_element = soup.select(f"div.InformationBoxTitle:-soup-contains('{text_search}') + div.InformationBoxContents")
         
         if selected_element:
             try:
@@ -18,7 +17,7 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
                 return selected_element[0]
             except:
-                logging.warning(f"An exception was raised when attempting to get the content of the elected element in _get_wrestler_selected_element when searching for {text_search}")
+                logging.warning(f"An exception was raised when attempting to get the content of the elected element in _get_selected_element when searching for {text_search}")
 
         logging.info(f"No data was found when searching for {text_search}")
         return None
@@ -27,7 +26,6 @@ class CagematchWrestlerAccessor(CagematchAccessor):
     def _construct_wrestler_data(cls, cagematch_wrestler_id, wrestler_soup, search_result=None):
         data = {}
         if search_result:
-            print("Testing")
             data['cagematch_wrestler_id'] = search_result.result_id
             data['main_name'] = search_result.gimmick
             data['dob'] = search_result.birthday
@@ -48,6 +46,8 @@ class CagematchWrestlerAccessor(CagematchAccessor):
         data['background_in_sports'] = cls._get_background_in_sports(wrestler_soup)
         data['social_media_links'] = cls._get_social_media_links(wrestler_soup)
         data['roles'] = cls._get_roles(wrestler_soup)
+        data['beginning_of_in_ring_career'] = cls._get_beginning_of_in_ring_career(wrestler_soup)
+        data['in_ring_experience'] = cls._get_in_ring_experience(wrestler_soup)
         data['wrestling_style'] = cls._get_wrestling_style(wrestler_soup)
         data['trainers'] = cls._get_trainers(wrestler_soup)
         data['nicknames'] = cls._get_nicknames(wrestler_soup)
@@ -169,22 +169,23 @@ class CagematchWrestlerAccessor(CagematchAccessor):
         search_url = f"https://www.cagematch.net/?id=2&view=workers&search={search_term}"
         search_soup = cls._scrape_data(search_url)
 
-        table_content = cls._get_table_content(search_soup)
-
-        for entry in table_content:
-            link = entry.find('a', href=True)['href']
-            link_id = cls._get_id_from_url(link)
+        for row_data in cls._separate_row_data(search_soup):
+            link_id = cls._safe_extract_id_from_table(1, row_data)
             
-            try:
-                if link_id == str(cagematch_wrestler_id):
-                    return entry.find_all("td")[2].text.replace(".", "/")
-
-            except:
-                logging.warning(f"An issue was found when attempting to parse the date for id {cagematch_wrestler_id}, this was done during matching regex for the id on one of the search entries.")
+            if link_id == cagematch_wrestler_id:
+                return cls._safe_extract_table_data(row_data, 2)
     
     @classmethod
     def _get_roles(cls, wrestler_soup):
         return cls._get_br_entries(wrestler_soup, "Roles:")
+
+    @classmethod
+    def _get_beginning_of_in_ring_career(cls, wrestler_soup):
+        return cls._get_wrestler_selected_element(wrestler_soup, "Beginning of in-ring career:")
+
+    @classmethod
+    def _get_in_ring_experience(cls, wrestler_soup):
+        return cls._get_wrestler_selected_element(wrestler_soup, "In-ring experience:")
 
     @classmethod
     def _get_trainers(cls, wrestler_soup):
@@ -207,7 +208,6 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def scrape_wrestler(cls, cagematch_wrestler_id, search_result=None):
-        print(search_result)
         logging.info(f"Scraping data for the wrestler with Cagematch ID of {cagematch_wrestler_id}.")
         wrestler_soup = cls._scrape_data(f"https://www.cagematch.net/?id=2&nr={str(cagematch_wrestler_id)}")
         return cls._construct_wrestler_data(cagematch_wrestler_id, wrestler_soup, search_result)

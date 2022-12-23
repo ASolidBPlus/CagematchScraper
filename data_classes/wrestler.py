@@ -14,6 +14,8 @@ class Wrestler(CagematchObject):
     background_in_sports: list
     social_media_links: list
     roles: list
+    beginning_of_in_ring_career: str
+    in_ring_experience: str
     wrestling_style: list
     trainers: list
     nicknames: list

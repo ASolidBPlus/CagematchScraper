@@ -34,13 +34,13 @@ class CagematchObjectArray(CagematchObject):
         self.__items = items
 
     def __len__(self):
-        return len(self.items)
+        return len(self.__items)
 
     def __iter__(self):
         return iter(self.__items)
 
     def __getitem__(self, key):
-        return self.items[key]
+        return self.__items[key]
 
     def __setitem__(self, key, value):
         self.__items[key] = value
