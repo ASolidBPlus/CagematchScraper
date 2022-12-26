@@ -26,7 +26,7 @@ class CagematchSearchAccessor(CagematchAccessor):
     @classmethod
     def _construct_wrestler_search_result(cls, row_data):
         construct_data = {}
-        construct_data['result_id'] = cls._safe_extract_id_from_table(1, row_data)
+        construct_data['cagematch_id'] = cls._safe_extract_id_from_table(1, row_data)
         construct_data['result_placement'] = cls._get_result_placement(row_data)
         construct_data['gimmick'] = cls._safe_extract_table_data(row_data, 1)
         construct_data['birthday'] = cls._safe_extract_table_data(row_data, 2)

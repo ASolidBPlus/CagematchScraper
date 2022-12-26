@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 import cagematch
-from data_classes.partialcagematchobject import PartialCagematchObject
+from data_classes.partial_cagematch_objects import PartialWrestlerCagematchObject, PartialCagematchObject
 from data_classes.cagematchobject import CagematchObject
 
 # Building Block Classes
 # Shared attributes that all the "main" classes use
 @dataclass
 class BaseSearchEntry(CagematchObject):
-    result_id: int
     result_placement: int
 
 
@@ -50,16 +49,12 @@ class EventNameEntry(BaseSearchEntry):
 # Classes that search methods will be built around
 
 @dataclass
-class WrestlerSearchResult(PartialCagematchObject, RatingsEntry, PromotionIdEntry):
+class WrestlerSearchResult(PartialWrestlerCagematchObject, RatingsEntry, PromotionIdEntry):
     gimmick: str
     birthday: str
     birthplace: str
     height: int
     weight: int
-
-    def get_full_object(self):
-        return cagematch.Cagematch.get_wrestler(self.result_id, self)
-
 
 
 @dataclass

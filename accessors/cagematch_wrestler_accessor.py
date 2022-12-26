@@ -4,6 +4,7 @@ import re
 from accessors.cagematch_accessor import CagematchAccessor
 from data_classes.wrestler import Wrestler
 from data_classes.trainer import Trainer
+from data_classes.arrays import TrainerArray
 
 class CagematchWrestlerAccessor(CagematchAccessor):
     @classmethod
@@ -25,8 +26,9 @@ class CagematchWrestlerAccessor(CagematchAccessor):
     @classmethod
     def _construct_wrestler_data(cls, cagematch_wrestler_id, wrestler_soup, search_result=None):
         data = {}
+        print(cagematch_wrestler_id)
         if search_result:
-            data['cagematch_wrestler_id'] = search_result.result_id
+            data['cagematch_wrestler_id'] = search_result.cagematch_id
             data['main_name'] = search_result.gimmick
             data['dob'] = search_result.birthday
             data['birthplace'] = search_result.birthplace
@@ -189,22 +191,20 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def _get_trainers(cls, wrestler_soup):
-        trainer_entries = []
+        trainer_entries = TrainerArray()
 
-        try:
-            trainers_data = cls._get_wrestler_selected_element(wrestler_soup, "Trainer:", False).find_all('a', href=True)
+        trainers_data = cls._get_wrestler_selected_element(wrestler_soup, "Trainer:", False)
+        
+        if trainers_data is not None:
 
-            for trainer_data in trainers_data:
+            for trainer_data in trainers_data.find_all('a', href=True):
                 trainer_entries.append(
                     Trainer(
+                    cls._get_id_from_url(trainer_data['href']),
                     trainer_data.text,
-                    cls._get_id_from_url(trainer_data['href'])
-                ))
-
-            return trainer_entries
-
-        except:
-            return trainer_entries
+                        )
+                    )
+        return trainer_entries
 
     @classmethod
     def scrape_wrestler(cls, cagematch_wrestler_id, search_result=None):

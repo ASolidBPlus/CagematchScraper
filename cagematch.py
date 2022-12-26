@@ -1,6 +1,5 @@
 from accessors.cagematch_wrestler_accessor import CagematchWrestlerAccessor
 from accessors.cagematch_search_accessor import CagematchSearchAccessor
-import multiprocessing
 
 class Cagematch:
     
