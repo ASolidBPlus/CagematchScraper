@@ -25,8 +25,9 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def _construct_wrestler_data(cls, cagematch_wrestler_id, wrestler_soup, search_result=None):
+        logging.info(f"Constructing {cagematch_wrestler_id}")
+        
         data = {}
-        print(cagematch_wrestler_id)
         if search_result:
             data['cagematch_wrestler_id'] = search_result.cagematch_id
             data['main_name'] = search_result.gimmick
