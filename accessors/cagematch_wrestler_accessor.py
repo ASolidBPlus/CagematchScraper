@@ -210,5 +210,5 @@ class CagematchWrestlerAccessor(CagematchAccessor):
     @classmethod
     def scrape_wrestler(cls, cagematch_wrestler_id, search_result=None):
         logging.info(f"Scraping data for the wrestler with Cagematch ID of {cagematch_wrestler_id}.")
-        wrestler_soup = cls._scrape_data(f"https://www.cagematch.net/?id=2&nr={str(cagematch_wrestler_id)}")
+        wrestler_soup = cls._scrape_data(cls._build_url(2, nr=cagematch_wrestler_id))
         return cls._construct_wrestler_data(cagematch_wrestler_id, wrestler_soup, search_result)
