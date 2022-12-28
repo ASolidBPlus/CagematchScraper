@@ -49,17 +49,7 @@ class CagematchSearchAccessor(CagematchAccessor):
                     search_soups.append(cls._scrape_data(f"{url}&s={page *100}"))
 
         return search_soups
-        
-    @classmethod
-    def search_wrestler(cls, maximum_pages=1, **kwargs):
-        search_soups = cls._handle_search(2, maximum_pages, view='workers', **kwargs)
-                        
-        results = []
-        for search_soup in search_soups:
-            results.extend([cls._construct_wrestler_search_result(row_data) for row_data in cls._separate_row_data(search_soup)])
-            
-        return SearchResultArray(results)
-    
+
     @classmethod
     def _construct_wrestler_search_result(cls, row_data):
         construct_data = {}
@@ -76,3 +66,12 @@ class CagematchSearchAccessor(CagematchAccessor):
 
         return WrestlerSearchResult(**construct_data)
 
+    @classmethod
+    def search_wrestler(cls, maximum_pages=1, **kwargs):
+        search_soups = cls._handle_search(2, maximum_pages, view='workers', **kwargs)
+                        
+        results = []
+        for search_soup in search_soups:
+            results.extend([cls._construct_wrestler_search_result(row_data) for row_data in cls._separate_row_data(search_soup)])
+            
+        return SearchResultArray(results)
