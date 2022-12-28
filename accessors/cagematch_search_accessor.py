@@ -1,3 +1,5 @@
+import re
+import logging
 from accessors.cagematch_accessor import CagematchAccessor
 from data_classes.search_results import *
 from data_classes.arrays import SearchResultArray
@@ -14,15 +16,40 @@ class CagematchSearchAccessor(CagematchAccessor):
 
     @classmethod
     def _get_search_result_amount(cls, soup):
-        pass
+        table_header = soup.find('div', class_='TableHeaderOff')
+        
+        if table_header is not None:
+            match = re.search(r'(\d+) items', table_header.text)
+            
+            if match:
+                third_number = match.group(1)
+                
+                return int(third_number)
     
     @classmethod
-    def search_wrestler(cls, search_text='', maximum_pages=1):
-        search_soup = cls._scrape_data(f"https://www.cagematch.net/?id=2&view=workers&search={search_text}")
-        # print(cls._get_selected_element("TableHeaderOff", search_soup, "Displaying"))
-            
-        return SearchResultArray([cls._construct_wrestler_search_result(row_data) for row_data in cls._separate_row_data(search_soup)])
-    
+    def _handle_search(cls, id, maximum_pages=1, **kwargs):
+        url = cls._build_url(id, **kwargs)
+        logging.info(f"Searching using base URL: {url}")
+        base_search_soup = cls._scrape_data(url)
+        search_amount = cls._get_search_result_amount(base_search_soup)
+        
+        search_soups = [base_search_soup]
+
+        if search_amount is not None:
+            if search_amount > 100 and maximum_pages > 1:
+                logging.info("More pages needs to be scraped for the search result")
+                
+                if search_amount > maximum_pages * 100:
+                    max_page_range = maximum_pages
+                                
+                else:
+                    max_page_range = search_amount // 100
+                    
+                for page in range(1, max_page_range):
+                    search_soups.append(cls._scrape_data(f"{url}&s={page *100}"))
+
+        return search_soups
+
     @classmethod
     def _construct_wrestler_search_result(cls, row_data):
         construct_data = {}
@@ -39,3 +66,12 @@ class CagematchSearchAccessor(CagematchAccessor):
 
         return WrestlerSearchResult(**construct_data)
 
+    @classmethod
+    def search_wrestler(cls, maximum_pages=1, **kwargs):
+        search_soups = cls._handle_search(2, maximum_pages, view='workers', **kwargs)
+                        
+        results = []
+        for search_soup in search_soups:
+            results.extend([cls._construct_wrestler_search_result(row_data) for row_data in cls._separate_row_data(search_soup)])
+            
+        return SearchResultArray(results)

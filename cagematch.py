@@ -8,8 +8,5 @@ class Cagematch:
         return CagematchWrestlerAccessor.scrape_wrestler(cagematch_wrestler_id, search_result)
 
     @classmethod
-    def search_wrestler(cls, text=None):
-        return CagematchSearchAccessor.search_wrestler(text)
-
-if __name__ == '__main__':
-    Cagematch()
+    def search_wrestler(cls, maximum_pages=1, **kwargs):
+        return CagematchSearchAccessor.search_wrestler(maximum_pages, **kwargs)

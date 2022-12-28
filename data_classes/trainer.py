@@ -1,7 +1,11 @@
+import cagematch
 from dataclasses import dataclass
-from data_classes.cagematchobject import CagematchObject
-from data_classes.partial_cagematch_objects import PartialWrestlerCagematchObject
+from data_classes.cagematch_object import CagematchObject
+from data_classes.partial_cagematch_objects import PartialCagematchObject
 
 @dataclass
-class Trainer(PartialWrestlerCagematchObject):
+class Trainer(PartialCagematchObject):
     name: str
+    
+    def get_full_object(self):
+        return cagematch.Cagematch.get_wrestler(self.cagematch_id)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from data_classes.cagematchobject import CagematchObject
+from data_classes.cagematch_object import CagematchObject
 from data_classes.arrays import TrainerArray
 
 @dataclass

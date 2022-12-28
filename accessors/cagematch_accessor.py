@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import logging
+from urllib.parse import urlencode, urlunsplit
 
 class CagematchAccessor:
     
@@ -9,6 +10,15 @@ class CagematchAccessor:
     def _scrape_data(cls, url):
         r = requests.get(url, headers={'Accept-Encoding': 'identity'})
         return BeautifulSoup(r.content, features="html.parser")
+
+    @classmethod
+    def _build_url(cls, id, **kwargs):
+        scheme = 'https'
+        netloc = 'www.cagematch.net'
+        path = '/'
+        query = urlencode({**{'id': id}, **kwargs})
+        fragment = ''
+        return urlunsplit((scheme, netloc, path, query, fragment))
 
     @classmethod
     def _get_table_content(cls, soup):
