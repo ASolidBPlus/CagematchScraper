@@ -1,7 +1,7 @@
 from dataclasses import dataclass
+from data_classes.partial_cagematch_objects import PartialCagematchObject
+from data_classes.cagematch_object import CagematchObject
 import cagematch
-from data_classes.partial_cagematch_objects import PartialWrestlerCagematchObject, PartialCagematchObject
-from data_classes.cagematchobject import CagematchObject
 
 # Building Block Classes
 # Shared attributes that all the "main" classes use
@@ -49,12 +49,15 @@ class EventNameEntry(BaseSearchEntry):
 # Classes that search methods will be built around
 
 @dataclass
-class WrestlerSearchResult(PartialWrestlerCagematchObject, RatingsEntry, PromotionIdEntry):
+class WrestlerSearchResult(PartialCagematchObject, RatingsEntry, PromotionIdEntry):
     gimmick: str
     birthday: str
     birthplace: str
     height: int
     weight: int
+    
+    def get_full_object(self):
+        return cagematch.Cagematch.get_wrestler(self.cagematch_id, self)
 
 
 @dataclass
@@ -75,7 +78,7 @@ class AdvancedMatchSearchResult(PartialCagematchObject, DateEntry, PromotionIdEn
 
 @dataclass
 class PromotionSearchResult(PartialCagematchObject, PromotionIdEntry, LocationEntry, RatingsEntry):
-    name: str
+    promotion_name: str
     years: str
 
 
@@ -92,7 +95,7 @@ class TagTeamSearchResult(PartialCagematchObject, MembersEntry, RatingsEntry):
 
 @dataclass
 class StableSearchResult(PartialCagematchObject, MembersEntry, RatingsEntry):
-    name: str
+    stable_name: str
     active_time: str
 
 
