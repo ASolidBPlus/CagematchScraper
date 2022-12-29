@@ -9,4 +9,4 @@ class Cagematch:
 
     @classmethod
     def search_wrestler(cls, maximum_pages=1, **kwargs):
-        return CagematchSearchAccessor.search_wrestler(maximum_pages, **kwargs)
+        return CagematchSearchAccessor.scrape_search('wrestler', maximum_pages, **kwargs)

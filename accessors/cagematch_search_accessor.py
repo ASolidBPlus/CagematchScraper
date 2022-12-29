@@ -27,10 +27,9 @@ class CagematchSearchAccessor(CagematchAccessor):
                 return int(third_number)
     
     @classmethod
-    def _handle_search(cls, id, maximum_pages=1, **kwargs):
-        url = cls._build_url(id, **kwargs)
-        logging.info(f"Searching using base URL: {url}")
-        base_search_soup = cls._scrape_data(url)
+    def _handle_search(cls, search_url, maximum_pages=1):
+        logging.info(f"Searching using base URL: {search_url}")
+        base_search_soup = cls._scrape_data(search_url)
         search_amount = cls._get_search_result_amount(base_search_soup)
         
         search_soups = [base_search_soup]
@@ -46,7 +45,7 @@ class CagematchSearchAccessor(CagematchAccessor):
                     max_page_range = search_amount // 100
                     
                 for page in range(1, max_page_range):
-                    search_soups.append(cls._scrape_data(f"{url}&s={page *100}"))
+                    search_soups.append(cls._scrape_data(f"{search_url}&s={page *100}"))
 
         return search_soups
 
@@ -67,11 +66,26 @@ class CagematchSearchAccessor(CagematchAccessor):
         return WrestlerSearchResult(**construct_data)
 
     @classmethod
-    def search_wrestler(cls, maximum_pages=1, **kwargs):
-        search_soups = cls._handle_search(2, maximum_pages, view='workers', **kwargs)
+    def scrape_search(cls, search_type, maximum_pages=1, **kwargs):
+        search_type_mapping = {
+            'wrestler': {'id': 2, 'view': 'workers'}
+        }
+
+        construct_result_mapping = {
+        'wrestler': cls._construct_wrestler_search_result,
+        }
+
+        search_params = search_type_mapping.get(search_type)
+        construct_result_method = construct_result_mapping.get(search_type)
+
+        if search_params is None or construct_result_method is None:
+            raise ValueError(f"Invalid search type: {search_type}. This could mean the provided search type has no search parameters, construct method, or both.")
+
+        search_soups = cls._handle_search(cls._build_url(**search_params, **kwargs), maximum_pages)
                         
         results = []
+
         for search_soup in search_soups:
-            results.extend([cls._construct_wrestler_search_result(row_data) for row_data in cls._separate_row_data(search_soup)])
+            results.extend([construct_result_method(row_data) for row_data in cls._separate_row_data(search_soup)])
             
         return SearchResultArray(results)
