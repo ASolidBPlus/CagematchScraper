@@ -12,7 +12,7 @@ class CagematchAccessor:
         return BeautifulSoup(r.content, features="html.parser")
 
     @classmethod
-    def _build_url(cls, id, **kwargs):
+    def _build_url(cls, **kwargs):
         scheme = 'https'
         netloc = 'www.cagematch.net'
         path = '/'
