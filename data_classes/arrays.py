@@ -31,19 +31,12 @@ class ConvertableObjectArray(CagematchObjectArray):
         return create_array(full_objects)
 
     def convert_to_objects(self):
-        full_objects = []
-
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            # Submit tasks to be executed concurrently
-            tasks = [executor.submit(partial_object.get_full_object) for partial_object in self]
+            # Apply the get_full_object method concurrently to each partial object in the array
+            full_objects = list(executor.map(lambda x: x.get_full_object(), self))
 
-            # Wait for all tasks to complete
-            concurrent.futures.wait(tasks)
+        return create_array(full_objects)
 
-            # Retrieve the results of the tasks
-            full_objects = [task.result() for task in tasks]
-
-        return create_array(full_objects) 
 
 
 class SearchResultArray(ConvertableObjectArray):
