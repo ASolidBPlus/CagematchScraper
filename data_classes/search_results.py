@@ -61,8 +61,12 @@ class WrestlerSearchResult(PartialCagematchObject, RatingsEntry, PromotionIdEntr
 
 
 @dataclass
-class EventSearchResult(PartialCagematchObject, DateEntry, RatingsEntry, EventNameEntry):
-    pass
+class EventSearchResult(PartialCagematchObject, DateEntry, LocationEntry, RatingsEntry, EventNameEntry):
+    
+    promotions_involved: list
+
+    def get_full_object(self):
+        return None # Not implemented
 
 
 @dataclass
@@ -70,10 +74,16 @@ class MatchguideSearchResult(PartialCagematchObject, DateEntry, PromotionIdEntry
     match_fixture: str
     won: str
 
+    def get_full_object(self):
+        return None # Not implemented
+
 
 @dataclass
 class AdvancedMatchSearchResult(PartialCagematchObject, DateEntry, PromotionIdEntry, LocationEntry, EventNameEntry):
     match: str
+
+    def get_full_object(self):
+        return None # Not implemented
 
 
 @dataclass
@@ -81,16 +91,25 @@ class PromotionSearchResult(PartialCagematchObject, PromotionIdEntry, LocationEn
     promotion_name: str
     years: str
 
+    def get_full_object(self):
+        return None # Not implemented
+
 
 @dataclass
 class TitleSearchResult(PartialCagematchObject, PromotionIdEntry, RatingsEntry):
     title: str
     status: str
 
+    def get_full_object(self):
+        return None # Not implemented
+
 
 @dataclass
 class TagTeamSearchResult(PartialCagematchObject, MembersEntry, RatingsEntry):
     most_popular_name: str
+
+    def get_full_object(self):
+        return None # Not implemented
 
 
 @dataclass
@@ -98,9 +117,15 @@ class StableSearchResult(PartialCagematchObject, MembersEntry, RatingsEntry):
     stable_name: str
     active_time: str
 
+    def get_full_object(self):
+        return None # Not implemented
+
 
 @dataclass
 class TournamentSearchResult(PartialCagematchObject, PromotionIdEntry, RatingsEntry):
     title: str
     timeframe: str
     winners: list
+
+    def get_full_object(self):
+        return None # Not implemented

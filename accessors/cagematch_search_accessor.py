@@ -11,7 +11,23 @@ class CagematchSearchAccessor(CagematchAccessor):
         try:
             return int(cls._safe_extract_table_data(data, 0))
 
-        except ValueError:
+        except (ValueError, TypeError):
+            return None
+
+    @classmethod
+    def _get_rating_from_table(cls, data, index):
+        try:
+            return float(cls._safe_extract_table_data(data, index))
+
+        except (ValueError, TypeError):
+            return None
+
+    @classmethod
+    def _get_votes_from_table(cls, data, index):
+        try:
+            return int(cls._safe_extract_table_data(data, index))
+        
+        except (ValueError, TypeError):
             return None
 
     @classmethod
@@ -60,19 +76,35 @@ class CagematchSearchAccessor(CagematchAccessor):
         construct_data['height'] = cls._safe_extract_table_data(row_data, 4)
         construct_data['weight'] = cls._safe_extract_table_data(row_data, 5)
         construct_data['promotion_id'] = cls._safe_extract_id_from_table(6, row_data)
-        construct_data['rating'] = cls._safe_extract_table_data(row_data, 7)
-        construct_data['votes'] = cls._safe_extract_table_data(row_data, 8)
+        construct_data['rating'] = cls._get_rating_from_table(row_data, 7)
+        construct_data['votes'] = cls._get_votes_from_table(row_data, 8)
 
         return WrestlerSearchResult(**construct_data)
 
     @classmethod
+    def _construct_event_search_result(cls, row_data):
+        construct_data = {}
+        construct_data['result_placement'] = cls._get_result_placement(row_data)
+        construct_data['cagematch_id'] = None
+        construct_data['date'] = cls._safe_extract_table_data(row_data, 1)
+        construct_data['promotions_involved'] = None
+        construct_data['event_name'] = None
+        construct_data['location'] = cls._safe_extract_table_data(row_data, 3)
+        construct_data['rating'] = None
+        construct_data['votes'] = None
+
+        return EventSearchResult(**construct_data)
+
+    @classmethod
     def scrape_search(cls, search_type, maximum_pages=1, **kwargs):
         search_type_mapping = {
-            'wrestler': {'id': 2, 'view': 'workers'}
+            'wrestler': {'id': 2, 'view': 'workers'},
+            'event': {'id': 1, 'view': 'search'}
         }
 
         construct_result_mapping = {
         'wrestler': cls._construct_wrestler_search_result,
+        'event': cls._construct_event_search_result
         }
 
         search_params = search_type_mapping.get(search_type)
