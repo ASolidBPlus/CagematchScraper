@@ -29,14 +29,22 @@ class CagematchObject:
             
         return obj
     
-    def to_dict(self):
+    def to_dict(self, **kwargs):
         """Convert the CagematchObject to a dictionary.
-        
+
         This method converts the CagematchObject and all of its attributes
         to a dictionary by calling the `_recursive_to_dict` method on each
-        attribute.
-        
+        attribute. It also adds any extra keyword arguments passed to the method
+        to the dictionary.
+
+        Args:
+            **kwargs: Additional keyword arguments to be added to the dictionary.
+
         Returns:
             dict: The converted CagematchObject.
         """
-        return {attr: self._recursive_to_dict(value) for attr, value in vars(self).items()}
+        data = ({'object_type': self.__class__.__name__})
+        data.update({attr: self._recursive_to_dict(value) for attr, value in vars(self).items()})
+        data.update(kwargs)
+
+        return data

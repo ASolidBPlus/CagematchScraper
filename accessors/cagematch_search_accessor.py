@@ -8,12 +8,8 @@ class CagematchSearchAccessor(CagematchAccessor):
 
     @classmethod
     def _get_result_placement(cls, data):
-        try:
-            return int(cls._safe_extract_table_data(data, 0))
-
-        except (ValueError, TypeError):
-            return None
-
+        return cls._safe_extract_table_data(data, 0, int)
+        
     @classmethod
     def _get_rating_from_table(cls, data, index):
         try:
@@ -41,6 +37,23 @@ class CagematchSearchAccessor(CagematchAccessor):
                 third_number = match.group(1)
                 
                 return int(third_number)
+
+    @classmethod
+    def _get_event_promotions_involved(cls, soup):
+        row_url_ids = cls._safe_extract_ids_from_table(2, soup, False)
+
+        if len(row_url_ids) > 1:
+            return row_url_ids[:-1]
+
+        return None
+
+    @classmethod
+    def _get_event_cagematch_id(cls, soup):
+        row_url_ids = cls._safe_extract_ids_from_table(2, soup, False)
+
+        if row_url_ids is not None:
+            return row_url_ids[-1]
+
     
     @classmethod
     def _handle_search(cls, search_url, maximum_pages=1):
@@ -68,14 +81,14 @@ class CagematchSearchAccessor(CagematchAccessor):
     @classmethod
     def _construct_wrestler_search_result(cls, row_data):
         construct_data = {}
-        construct_data['cagematch_id'] = cls._safe_extract_id_from_table(1, row_data)
+        construct_data['cagematch_id'] = cls._safe_extract_ids_from_table(1, row_data)
         construct_data['result_placement'] = cls._get_result_placement(row_data)
         construct_data['gimmick'] = cls._safe_extract_table_data(row_data, 1)
         construct_data['birthday'] = cls._safe_extract_table_data(row_data, 2)
         construct_data['birthplace'] = cls._safe_extract_table_data(row_data, 3)
         construct_data['height'] = cls._safe_extract_table_data(row_data, 4)
         construct_data['weight'] = cls._safe_extract_table_data(row_data, 5)
-        construct_data['promotion_id'] = cls._safe_extract_id_from_table(6, row_data)
+        construct_data['promotion_id'] = cls._safe_extract_ids_from_table(6, row_data)
         construct_data['rating'] = cls._get_rating_from_table(row_data, 7)
         construct_data['votes'] = cls._get_votes_from_table(row_data, 8)
 
@@ -84,14 +97,14 @@ class CagematchSearchAccessor(CagematchAccessor):
     @classmethod
     def _construct_event_search_result(cls, row_data):
         construct_data = {}
+        construct_data['cagematch_id'] = cls._get_event_cagematch_id(row_data)
         construct_data['result_placement'] = cls._get_result_placement(row_data)
-        construct_data['cagematch_id'] = None
         construct_data['date'] = cls._safe_extract_table_data(row_data, 1)
-        construct_data['promotions_involved'] = None
-        construct_data['event_name'] = None
+        construct_data['promotions_involved'] = cls._get_event_promotions_involved(row_data)
+        construct_data['event_name'] = cls._safe_extract_table_data(row_data, 2)
         construct_data['location'] = cls._safe_extract_table_data(row_data, 3)
-        construct_data['rating'] = None
-        construct_data['votes'] = None
+        construct_data['rating'] = cls._safe_extract_table_data(row_data, 6, float)
+        construct_data['votes'] = cls._safe_extract_table_data(row_data, 7, int)
 
         return EventSearchResult(**construct_data)
 
@@ -120,4 +133,4 @@ class CagematchSearchAccessor(CagematchAccessor):
         for search_soup in search_soups:
             results.extend([construct_result_method(row_data) for row_data in cls._separate_row_data(search_soup)])
             
-        return SearchResultArray(results)
+        return SearchResultArray(results, **kwargs)

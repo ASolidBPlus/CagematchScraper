@@ -173,7 +173,7 @@ class CagematchWrestlerAccessor(CagematchAccessor):
         search_soup = cls._scrape_data(search_url)
 
         for row_data in cls._separate_row_data(search_soup):
-            link_id = cls._safe_extract_id_from_table(1, row_data)
+            link_id = cls._safe_extract_ids_from_table(1, row_data)
             
             if link_id == cagematch_wrestler_id:
                 return cls._safe_extract_table_data(row_data, 2)

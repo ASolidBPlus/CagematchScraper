@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from typing import Optional, Callable, Any, Union
 import re
 import logging
 from urllib.parse import urlencode, urlunsplit
@@ -42,29 +43,34 @@ class CagematchAccessor:
         return None
 
     @classmethod
-    def _safe_extract_table_data(cls, table_data, index, return_text=True):
+    def _safe_extract_table_data(cls, table_data: list[BeautifulSoup], index: int, return_type: Union[Callable[[str], Any], None] = None, return_text: bool = True) -> Optional[Any]:
         try:
             if return_text:
-                if table_data[index].text.strip():
-                    return table_data[index].text.strip()
-                
-                return None
-            
-            return table_data[index]
-        
+                value = table_data[index].text.strip()
+                if value:
+                    if callable(return_type):
+                        return return_type(value)
+                    else:
+                        return value
+                else:
+                    return None
+            else:
+                return table_data[index]
         except (IndexError, AttributeError, TypeError):
             return None
 
     @classmethod
-    def _safe_extract_id_from_table(cls, extract_index, row_data):
-
+    def _safe_extract_ids_from_table(cls, extract_index, row_data, return_single=True):
         data = cls._safe_extract_table_data(row_data, extract_index, return_text=False)
 
         if data is not None:
             try:
-                link = data.find('a', href=True)
-                return cls._get_id_from_url(link['href'])
-            
+                links = data.find_all('a', href=True)
+                ids = [cls._get_id_from_url(link['href']) for link in links]
+                if return_single:
+                    return ids[0]
+                else:
+                    return ids
             except (IndexError, TypeError, KeyError):
                 return None
 

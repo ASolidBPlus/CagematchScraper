@@ -57,7 +57,7 @@ class WrestlerSearchResult(PartialCagematchObject, RatingsEntry, PromotionIdEntr
     weight: int
     
     def get_full_object(self):
-        return cagematch.Cagematch.get_wrestler(self.cagematch_id, self)
+        return cagematch.get_wrestler(self.cagematch_id, self)
 
 
 @dataclass

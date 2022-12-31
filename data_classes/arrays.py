@@ -8,14 +8,14 @@ class CagematchObjectArray(list, CagematchObject):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def to_dict(self):
+    def to_dict(self, **kwargs):
         dict_data = {}
     
-        dict_data['array_type'] = self.array_type()
         dict_data['total_items'] = len(self)
+        dict_data.update(kwargs)
         dict_data['items'] = [item.to_dict() if isinstance(item, CagematchObject) else item for item in self]
     
-        return dict_data
+        return super().to_dict(**dict_data)
     
     def array_type(self):
         return self.__class__.__name__
@@ -40,7 +40,9 @@ class ConvertableObjectArray(CagematchObjectArray):
 
 
 class SearchResultArray(ConvertableObjectArray):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.search_params = kwargs        
 
 
 class TrainerArray(ConvertableObjectArray):
