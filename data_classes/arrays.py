@@ -3,6 +3,7 @@ import data_classes.wrestler
 import data_classes.trainer
 import data_classes.search_results
 import concurrent.futures
+import utils
 
 class CagematchObjectArray(list, CagematchObject):
     def __init__(self, *args, **kwargs):
@@ -31,11 +32,8 @@ class ConvertableObjectArray(CagematchObjectArray):
         return create_array(full_objects)
 
     def convert_to_objects(self):
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            # Apply the get_full_object method concurrently to each partial object in the array
-            full_objects = list(executor.map(lambda x: x.get_full_object(), self))
 
-        return create_array(full_objects)
+        return utils.concurrent_action(self, lambda x: x.get_full_object())
 
 
 

@@ -18,7 +18,7 @@ def search_event(maximum_pages=1, **kwargs):
     - sPromotion (int): The ID of the promotion to search for.
     - sDateFromDay (int or str): The day of the start date to search for.
     - sDateFromMonth (int or str): The month of the start date to search for.
-    - sDateFromYear (int or str): The year of the start date to search for.
+    - sDateFromYear (int or str): The year of the start date to search for. - Default is 1800 to ensure Cagematch Search returns all events irrespective of timeframe by default
     - sDateTillDay (int or str): The day of the end date to search for.
     - sDateTillMonth (int or str): The month of the end date to search for.
     - sDateTillYear (int or str): The year of the end date to search for.
@@ -31,4 +31,7 @@ def search_event(maximum_pages=1, **kwargs):
     Returns:
     - A list of event search results.
     """
+    if kwargs.get('sDatefromYear') is None:
+        return CagematchSearchAccessor.scrape_search('event', maximum_pages, sDateFromYear=1800, **kwargs)
+
     return CagematchSearchAccessor.scrape_search('event', maximum_pages, **kwargs)

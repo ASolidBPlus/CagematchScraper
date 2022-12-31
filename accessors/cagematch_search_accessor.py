@@ -3,6 +3,7 @@ import logging
 from accessors.cagematch_accessor import CagematchAccessor
 from data_classes.search_results import *
 from data_classes.arrays import SearchResultArray
+import utils
 
 class CagematchSearchAccessor(CagematchAccessor):
 
@@ -71,10 +72,12 @@ class CagematchSearchAccessor(CagematchAccessor):
                     max_page_range = maximum_pages
                                 
                 else:
-                    max_page_range = search_amount // 100
+                    max_page_range = search_amount // 100 + (search_amount % 100 > 0)
+                    print(max_page_range)
                     
-                for page in range(1, max_page_range):
-                    search_soups.append(cls._scrape_data(f"{search_url}&s={page *100}"))
+                pages = [page for page in range(1, max_page_range)]
+                
+                search_soups.extend(utils.concurrent_action(pages, lambda page: cls._scrape_data(f"{search_url}&s={page *100}")))
 
         return search_soups
 
