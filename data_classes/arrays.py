@@ -3,7 +3,7 @@ import data_classes.wrestler
 import data_classes.trainer
 import data_classes.search_results
 import concurrent.futures
-import utils
+import global_utils
 
 class CagematchObjectArray(list, CagematchObject):
     def __init__(self, *args, **kwargs):
@@ -33,7 +33,7 @@ class ConvertableObjectArray(CagematchObjectArray):
 
     def convert_to_objects(self):
 
-        return utils.concurrent_action(self, lambda x: x.get_full_object())
+        return global_utils.concurrent_action(self, lambda x: x.get_full_object())
 
 
 

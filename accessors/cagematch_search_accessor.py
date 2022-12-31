@@ -3,7 +3,7 @@ import logging
 from accessors.cagematch_accessor import CagematchAccessor
 from data_classes.search_results import *
 from data_classes.arrays import SearchResultArray
-import utils
+import global_utils
 
 class CagematchSearchAccessor(CagematchAccessor):
 
@@ -77,7 +77,7 @@ class CagematchSearchAccessor(CagematchAccessor):
                     
                 pages = [page for page in range(1, max_page_range)]
                 
-                search_soups.extend(utils.concurrent_action(pages, lambda page: cls._scrape_data(f"{search_url}&s={page *100}")))
+                search_soups.extend(global_utils.concurrent_action(pages, lambda page: cls._scrape_data(f"{search_url}&s={page *100}")))
 
         return search_soups
 

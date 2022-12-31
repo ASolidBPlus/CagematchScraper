@@ -8,4 +8,4 @@ class Trainer(PartialCagematchObject):
     name: str
     
     def get_full_object(self):
-        return cagematch.Cagematch.get_wrestler(self.cagematch_id)
+        return cagematch.get_wrestler(self.cagematch_id)
