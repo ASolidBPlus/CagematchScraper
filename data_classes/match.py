@@ -6,17 +6,19 @@ from data_classes import partial_cagematch_objects
 @dataclass
 class BaseParticipant:
     name: str
-    notes: str
     manager: list
+    notes: str
+
 
 @dataclass
-class WrestlerParticipant(BaseParticipant, partial_cagematch_objects.PartialCagematchObject):
+class SingleParticipant(BaseParticipant, partial_cagematch_objects.PartialCagematchObject):
     def get_full_object(self):
         pass
 
+
 @dataclass
 class TeamParticipant(BaseParticipant, partial_cagematch_objects.PartialCagematchObject):
-    members: list(WrestlerParticipant)
+    members: list(SingleParticipant)
 
     def get_full_object(self):
         pass
@@ -32,16 +34,19 @@ class MatchParticipantsArray(arrays.ConvertableObjectArray):
         self._match = match
 
     def get_participants_str(self):
-        if len(self._match.participants) > 1:
-            # Logic to return string representing the participants in this array as team members
-            return
-
-        elif len(self._match.participants) == 1:
-            # Logic to return string representing the participants in this array as opponents
-            return
-
+        if self._match is not None:
+            if len(self) > 1:
+                # Multiple participants in this array, representing a team
+                # Team formatting logic goes here
+                pass
+            elif len(self) == 1:
+                # Single participant in this array, representing an opponent
+                # Opponent formatting logic goes here
+                pass
+            else:
+                raise ValueError("Participants not registered correctly.")
         else:
-            raise ValueError("Participants not registered correctly.")
+            raise ValueError("Match not registered with participants.")
 
 @dataclass
 class Match(cagematch_object.CagematchObject):
