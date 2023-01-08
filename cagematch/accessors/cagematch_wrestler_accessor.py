@@ -1,27 +1,13 @@
+
 import logging
 import re
 
-from accessors.cagematch_accessor import CagematchAccessor
-from data_classes.wrestler import Wrestler
-from data_classes.trainer import Trainer
-from data_classes.arrays import TrainerArray
+from cagematch.accessors import CagematchAccessor
+from cagematch.data_classes.wrestler import Wrestler
+from cagematch.data_classes.trainer import Trainer
+from cagematch.data_classes.arrays import TrainerArray
 
 class CagematchWrestlerAccessor(CagematchAccessor):
-    @classmethod
-    def _get_wrestler_selected_element(cls, soup, text_search, return_text=True):
-        selected_element = soup.select(f"div.InformationBoxTitle:-soup-contains('{text_search}') + div.InformationBoxContents")
-        
-        if selected_element:
-            try:
-                if return_text:
-                    return selected_element[0].text.strip()
-
-                return selected_element[0]
-            except:
-                logging.warning(f"An exception was raised when attempting to get the content of the elected element in _get_selected_element when searching for {text_search}")
-
-        logging.info(f"No data was found when searching for {text_search}")
-        return None
 
     @classmethod
     def _construct_wrestler_data(cls, cagematch_wrestler_id, wrestler_soup, search_result=None):
@@ -60,7 +46,7 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def _get_split_entries(cls, wrestler_soup, text_search):
-        entry_data = cls._get_wrestler_selected_element(wrestler_soup, text_search)
+        entry_data = cls._get_element_by_text_in_information_box(wrestler_soup, text_search)
 
         if entry_data is not None:
             try:
@@ -73,7 +59,7 @@ class CagematchWrestlerAccessor(CagematchAccessor):
     
     @classmethod
     def _get_br_entries(cls, wrestler_soup, text_search):
-        br_data = cls._get_wrestler_selected_element(wrestler_soup, text_search, return_text=False)
+        br_data = cls._get_element_by_text_in_information_box(wrestler_soup, text_search, return_text=False)
 
         if br_data is not None:
             try:
@@ -100,15 +86,15 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def _get_birthplace(cls, wrestler_soup):
-        return cls._get_wrestler_selected_element(wrestler_soup, "Birthplace:")
+        return cls._get_element_by_text_in_information_box(wrestler_soup, "Birthplace:")
 
     @classmethod
     def _get_gender(cls, wrestler_soup):
-        return cls._get_wrestler_selected_element(wrestler_soup, "Gender:")
+        return cls._get_element_by_text_in_information_box(wrestler_soup, "Gender:")
 
     @classmethod
     def _get_height(cls, wrestler_soup):
-        height_data = cls._get_wrestler_selected_element(wrestler_soup, "Height:")
+        height_data = cls._get_element_by_text_in_information_box(wrestler_soup, "Height:")
 
         if height_data is not None:
             return(cls._get_metric(height_data, 'cm'))
@@ -117,7 +103,7 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def _get_weight(cls, wrestler_soup):
-        weight_data = cls._get_wrestler_selected_element(wrestler_soup, "Weight:")
+        weight_data = cls._get_element_by_text_in_information_box(wrestler_soup, "Weight:")
 
         if weight_data is not None:
             return(cls._get_metric(weight_data, 'kg'))
@@ -130,7 +116,7 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def _get_social_media_links(cls, wrestler_soup):
-        social_media_data = cls._get_wrestler_selected_element(wrestler_soup, "WWW:", return_text=False)
+        social_media_data = cls._get_element_by_text_in_information_box(wrestler_soup, "WWW:", return_text=False)
 
         if social_media_data is not None:
             return [link['href'] for link in social_media_data.find_all('a', href=True)]
@@ -143,7 +129,7 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def _get_alter_egos(cls, wrestler_soup):
-        alter_ego_data = cls._get_wrestler_selected_element(wrestler_soup, "Alter egos:", return_text=False)
+        alter_ego_data = cls._get_element_by_text_in_information_box(wrestler_soup, "Alter egos:", return_text=False)
 
         if alter_ego_data is not None:
             try:
@@ -184,17 +170,17 @@ class CagematchWrestlerAccessor(CagematchAccessor):
 
     @classmethod
     def _get_beginning_of_in_ring_career(cls, wrestler_soup):
-        return cls._get_wrestler_selected_element(wrestler_soup, "Beginning of in-ring career:")
+        return cls._get_element_by_text_in_information_box(wrestler_soup, "Beginning of in-ring career:")
 
     @classmethod
     def _get_in_ring_experience(cls, wrestler_soup):
-        return cls._get_wrestler_selected_element(wrestler_soup, "In-ring experience:")
+        return cls._get_element_by_text_in_information_box(wrestler_soup, "In-ring experience:")
 
     @classmethod
     def _get_trainers(cls, wrestler_soup):
         trainer_entries = TrainerArray()
 
-        trainers_data = cls._get_wrestler_selected_element(wrestler_soup, "Trainer:", False)
+        trainers_data = cls._get_element_by_text_in_information_box(wrestler_soup, "Trainer:", False)
         
         if trainers_data is not None:
 

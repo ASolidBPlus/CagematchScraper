@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from data_classes.cagematch_object import CagematchObject
-from data_classes.arrays import TrainerArray
+from cagematch.data_classes.cagematch_object import CagematchObject
 
 @dataclass
 class Wrestler(CagematchObject):
@@ -18,6 +17,6 @@ class Wrestler(CagematchObject):
     beginning_of_in_ring_career: str
     in_ring_experience: str
     wrestling_style: list
-    trainers: TrainerArray
+    trainers: list
     nicknames: list
     signature_moves: list

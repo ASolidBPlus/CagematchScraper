@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from data_classes.partial_cagematch_objects import PartialCagematchObject
-from data_classes.cagematch_object import CagematchObject
+from cagematch.data_classes.partial_cagematch_objects import PartialCagematchObject
+from cagematch.data_classes.cagematch_object import CagematchObject
 import cagematch
 
 # Building Block Classes

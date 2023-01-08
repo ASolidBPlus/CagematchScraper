@@ -1,12 +1,12 @@
-from accessors.cagematch_wrestler_accessor import CagematchWrestlerAccessor
-from accessors.cagematch_search_accessor import CagematchSearchAccessor
+from .accessors import CagematchAccessor, CagematchEventAccessor, CagematchWrestlerAccessor, CagematchSearchAccessor
 
-    
 def get_wrestler(cagematch_wrestler_id, search_result=None):
     return CagematchWrestlerAccessor.scrape_wrestler(cagematch_wrestler_id, search_result)
 
+
 def search_wrestler(maximum_pages=1, **kwargs):
     return CagematchSearchAccessor.scrape_search('wrestler', maximum_pages, **kwargs)
+
 
 def search_event(maximum_pages=1, **kwargs):
     """

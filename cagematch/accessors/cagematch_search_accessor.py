@@ -1,9 +1,9 @@
 import re
 import logging
-from accessors.cagematch_accessor import CagematchAccessor
-from data_classes.search_results import *
-from data_classes.arrays import SearchResultArray
-import global_utils
+from cagematch.accessors.cagematch_accessor import CagematchAccessor
+from cagematch.data_classes.search_results import WrestlerSearchResult, EventSearchResult
+from cagematch.data_classes.arrays import SearchResultArray
+import cagematch.global_utils
 
 class CagematchSearchAccessor(CagematchAccessor):
 
@@ -55,7 +55,6 @@ class CagematchSearchAccessor(CagematchAccessor):
         if row_url_ids is not None:
             return row_url_ids[-1]
 
-    
     @classmethod
     def _handle_search(cls, search_url, maximum_pages=1):
         logging.info(f"Searching using base URL: {search_url}")
@@ -77,7 +76,7 @@ class CagematchSearchAccessor(CagematchAccessor):
                     
                 pages = [page for page in range(1, max_page_range)]
                 
-                search_soups.extend(global_utils.concurrent_action(pages, lambda page: cls._scrape_data(f"{search_url}&s={page *100}")))
+                search_soups.extend(cagematch.global_utils.concurrent_action(pages, lambda page: cls._scrape_data(f"{search_url}&s={page *100}")))
 
         return search_soups
 

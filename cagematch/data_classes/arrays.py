@@ -1,9 +1,5 @@
-from data_classes.cagematch_object import CagematchObject
-import data_classes.wrestler 
-import data_classes.trainer
-import data_classes.search_results
-import concurrent.futures
-import global_utils
+from cagematch import global_utils
+from cagematch.data_classes.cagematch_object import CagematchObject
 
 class CagematchObjectArray(list, CagematchObject):
     def __init__(self, *args, **kwargs):

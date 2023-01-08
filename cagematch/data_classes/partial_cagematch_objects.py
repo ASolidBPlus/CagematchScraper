@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .cagematch_object import CagematchObject
+from cagematch.data_classes.cagematch_object import CagematchObject
 from dataclasses import dataclass
 
 @dataclass

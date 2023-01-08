@@ -75,3 +75,20 @@ class CagematchAccessor:
                 return None
 
         return None
+
+    @classmethod
+    def _get_element_by_text_in_information_box(cls, soup, text_search, return_text=True):
+        selected_element = soup.select(f"div.InformationBoxTitle:-soup-contains('{text_search}') + div.InformationBoxContents")
+        
+        if selected_element:
+            try:
+                if return_text:
+                    return selected_element[0].text.strip()
+
+                return selected_element[0]
+            except:
+                logging.warning(f"An exception was raised when attempting to get the content of the elected element in _get_selected_element when searching for {text_search}")
+
+        logging.info(f"No data was found when searching for {text_search}")
+        return None
+
